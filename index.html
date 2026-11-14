@@ -59,8 +59,18 @@
     <p class="sub">Type cheyyalsina pani ledu. Mee problem okka voice note lo cheppandi — official complaint letter, reference number tho saha, ready ga vasthundi. Ee page lo ippudu: <b>Arji</b> (civic complaint).</p>
   </header>
 
+  <div class="panel" id="voicePanelAnchor" style="border-color:#B3402A;">
+    <h2>🎤 Voice Mode — matladithe chalu, anthe</h2>
+    <p style="font-size:15.5px;line-height:1.55;margin-top:4px;">Chadavadam, rayadam rani vallaki kuda: BolKaam okko question <b>voice lo aduguthundi</b>, meeru <b>voice lo answer cheppandi</b>. Letter ready ayyaka BolKaam <b>chadivi kuda vinipisthundi</b>. Type cheyyadam kevalam backup.</p>
+    <div id="voiceQ" style="font-family:'Fraunces',serif;font-size:23px;font-weight:700;line-height:1.35;margin:16px 0 6px;">Start cheyyalante kinda pedda button nokkandi.</div>
+    <div id="voiceChips" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;"></div>
+    <button class="primary" id="voiceStart" style="background:#256D46;">🎤 Voice tho modalu pettu</button>
+    <button id="voiceNext" style="display:none;width:100%;margin-top:10px;">Next ➡</button>
+    <p id="voiceStatus" style="margin-top:10px;color:#5C5240;font-size:14.5px;"></p>
+  </div>
+
   <div class="panel">
-    <h2><span class="no">1</span>Mee problem cheppandi</h2>
+    <h2><span class="no">1</span>Form — typing backup (voice lekapothe)</h2>
     <div class="row">
       <div><label>Problem enti?</label>
         <select id="ptype">
@@ -97,6 +107,7 @@
     <div class="tear"></div>
     <label>Meeku simple ga — Telugu summary</label>
     <p id="summary"></p>
+    <button id="speakBtn" style="margin-top:12px;background:#256D46;color:#FFF6E8;">🔊 Naaku vinipinchi cheppu (listen)</button>
     <div class="tear"></div>
     <label>Tracking — tarvatha enti?</label>
     <div class="track" id="track"></div>
@@ -117,6 +128,10 @@ var DEPT = {
 var TYPE_TE = {
   water: 'water pipe problem', drainage: 'drainage overflow problem',
   streetlight: 'streetlight problem', road: 'road damage problem', garbage: 'garbage problem'
+};
+var TYPE_SCRIPT = {
+  water: 'వాటర్ పైప్ సమస్య', drainage: 'డ్రైనేజ్ ఓవర్‌ఫ్లో సమస్య',
+  streetlight: 'స్ట్రీట్ లైట్ సమస్య', road: 'రోడ్డు డ్యామేజ్ సమస్య', garbage: 'చెత్త సమస్య'
 };
 function makeRef(type, area, days) {
   var s = (type + '|' + area + '|' + days).split('').reduce(function (a, c) { return (a * 31 + c.charCodeAt(0)) % 9973; }, 7);
@@ -144,7 +159,8 @@ d.desc + '\n\n' +
     { when: 'Day 3', what: 'Officer visit rakpothe, reference number tho phone chesi adagandi: "Inspection eppudu vastundi?"' },
     { when: 'Day 7', what: 'Inka avvakapothe, ide letter tho senior officer ki escalation pampandi — reference number first line lo rayandi.' }
   ];
-  return { ref: ref, letter: letter, summary: summary, track: track };
+  var summaryScript = 'మీరు చెప్పిన ' + (TYPE_SCRIPT[d.type] || 'సమస్య') + ' గురించి అధికారిక కంప్లైంట్ లెటర్ రెడీ అయింది. రిఫరెన్స్ నంబర్ ' + ref + '. ఈ లెటర్ ' + dept.office + ' కి పంపాలి. మీ పేరు, మీ ఏరియా, ' + d.days + ' రోజుల సమస్య — అన్నీ మీరు చెప్పినవే, కొత్తవి ఏమీ చేర్చలేదు. సబ్మిట్ చేయడం మీరే ఫైనల్ గా చేస్తారు.';
+  return { ref: ref, letter: letter, summary: summary, summaryScript: summaryScript, track: track };
 }
 // GEN END
 
@@ -169,6 +185,7 @@ document.getElementById('genBtn').onclick = function () {
     days: Math.max(1, parseInt(document.getElementById('days').value || '1', 10)),
     desc: desc, name: name, area: area, dateStr: todayStr()
   });
+  window._lastOut = out;
   document.getElementById('refId').textContent = out.ref;
   document.getElementById('letter').textContent = out.letter;
   document.getElementById('summary').textContent = out.summary;
@@ -201,6 +218,120 @@ else {
     rec.start();
   };
 }
+
+// ===== VOICE MODE — the app asks, the user only speaks =====
+var voiceQ = document.getElementById('voiceQ'), voiceStatus = document.getElementById('voiceStatus'),
+    voiceChips = document.getElementById('voiceChips'), voiceNext = document.getElementById('voiceNext');
+function speakT(text, done) {
+  var called = false;
+  function fin() { if (!called) { called = true; if (done) done(); } }
+  if (!('speechSynthesis' in window)) { fin(); return; }
+  try {
+    var u = new SpeechSynthesisUtterance(text);
+    var vs = speechSynthesis.getVoices();
+    for (var i = 0; i < vs.length; i++) { if (vs[i].lang && vs[i].lang.indexOf('te') === 0) { u.voice = vs[i]; break; } }
+    u.lang = 'te-IN'; u.rate = 0.96;
+    u.onend = fin; u.onerror = fin;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+    setTimeout(fin, 3200);
+  } catch (e) { fin(); }
+}
+function parseType(t) {
+  t = (t || '').toLowerCase();
+  if (/water|neellu|pipe|drinking|నీ|వాటర్/.test(t)) return 'water';
+  if (/drain|murugu|overflow|డ్రైన్/.test(t)) return 'drainage';
+  if (/street|light|deepam|లైట్/.test(t)) return 'streetlight';
+  if (/road|gothulu|pothole|రోడ్/.test(t)) return 'road';
+  if (/garbage|chetta|చెత్త/.test(t)) return 'garbage';
+  return null;
+}
+function parseDays(t) {
+  var m = (t || '').match(/(\d+)/);
+  if (m) return Math.max(1, parseInt(m[1], 10));
+  var w = { okka: 1, okati: 1, one: 1, rendu: 2, two: 2, moodu: 3, three: 3, nalugu: 4, four: 4, aidu: 5, five: 5, aaru: 6, six: 6, edu: 7, seven: 7 };
+  var low = (t || '').toLowerCase();
+  for (var k in w) { if (low.indexOf(k) !== -1) return w[k]; }
+  return null;
+}
+var VSTEPS = [
+  { q: 'Mee problem enti? Water pipe, drainage, streetlight, road, leka garbage — okkati cheppandi, leka kinda button nokkandi.',
+    qs: 'మీ సమస్య ఏంటి? వాటర్ పైప్, డ్రైనేజ్, స్ట్రీట్ లైట్, రోడ్డు, లేక చెత్త — ఒక్కటి చెప్పండి.',
+    chips: [['💧 Water pipe', 'water'], ['🚰 Drainage', 'drainage'], ['💡 Streetlight', 'streetlight'], ['🛣️ Road', 'road'], ['🗑️ Garbage', 'garbage']],
+    field: 'ptype', parse: parseType },
+  { q: 'Problem gurinchi konchem cheppandi — emi jarigindi?',
+    qs: 'సమస్య గురించి కొంచెం చెప్పండి — ఏమి జరిగింది?',
+    field: 'desc', parse: function (t) { return t && t.trim() ? t.trim() : null; } },
+  { q: 'Ee problem enni days nunchi undi? Number cheppandi.',
+    qs: 'ఈ సమస్య ఎన్ని రోజుల నుంచి ఉంది? నంబర్ చెప్పండి.',
+    chips: [['1 day', '1'], ['3 days', '3'], ['5 days', '5'], ['7 days', '7']],
+    field: 'days', parse: parseDays },
+  { q: 'Mee peru cheppandi.', qs: 'మీ పేరు చెప్పండి.',
+    field: 'uname', parse: function (t) { return t && t.trim() ? t.trim() : null; } },
+  { q: 'Mee area peru cheppandi.', qs: 'మీ ఏరియా పేరు చెప్పండి.',
+    field: 'area', parse: function (t) { return t && t.trim() ? t.trim() : null; } }
+];
+var vi = -1;
+function applyAns(v) {
+  var s = VSTEPS[vi]; if (!s) return;
+  document.getElementById(s.field).value = v;
+  vi++;
+  if (vi >= VSTEPS.length) finishVoice(); else askStep();
+}
+function listenFor(idx, s) {
+  if (!SR) { voiceStatus.textContent = 'Ee browser lo voice ledu — kinda form lo type chesi Next nokkandi.'; return; }
+  var rec = new SR(); rec.lang = 'te-IN'; rec.interimResults = false;
+  voiceStatus.textContent = '🎙️ Listening… answer cheppandi.';
+  rec.onresult = function (e) {
+    if (idx !== vi) return;
+    var said = e.results[0][0].transcript;
+    var v = s.parse(said);
+    if (v === null || v === undefined) {
+      voiceStatus.textContent = 'Ardham kaledu ("' + said + '") — malli cheppandi, leka chip / Next vadandi.';
+      speakT('మళ్ళీ చెప్పండి', function () { if (idx === vi) listenFor(idx, s); });
+    } else applyAns(v);
+  };
+  rec.onerror = function () { if (idx === vi) voiceStatus.textContent = 'Voice catch kaledu — chip nokkandi, leka form lo type chesi Next nokkandi.'; };
+  try { rec.start(); } catch (e) {}
+}
+function askStep() {
+  var idx = vi, s = VSTEPS[idx];
+  voiceQ.textContent = 'Question ' + (idx + 1) + '/5: ' + s.q;
+  voiceChips.innerHTML = '';
+  (s.chips || []).forEach(function (c) {
+    var b = document.createElement('button');
+    b.textContent = c[0]; b.style.cssText = 'box-shadow:3px 3px 0 #211A12;';
+    b.onclick = function () { if (idx === vi) applyAns(s.parse(c[1]) !== null ? s.parse(c[1]) : c[1]); };
+    voiceChips.appendChild(b);
+  });
+  voiceStatus.textContent = 'Question aduguthunna… ayyaka matladandi.';
+  speakT(s.qs, function () { if (idx === vi) listenFor(idx, s); });
+}
+function finishVoice() {
+  voiceQ.textContent = 'Ayipoyindi! Mee letter ready chesthunna…';
+  voiceChips.innerHTML = ''; voiceNext.style.display = 'none';
+  document.getElementById('genBtn').click();
+  setTimeout(function () {
+    if (window._lastOut) {
+      voiceStatus.textContent = 'Letter ready! Kinda undi — vinipisthunna, vinnandi.';
+      speakT(window._lastOut.summaryScript);
+    }
+  }, 600);
+}
+document.getElementById('voiceStart').onclick = function () {
+  vi = 0; voiceNext.style.display = 'block';
+  document.getElementById('voicePanelAnchor').scrollIntoView({ behavior: 'smooth' });
+  askStep();
+};
+voiceNext.onclick = function () {
+  var s = VSTEPS[vi]; if (!s) return;
+  var raw = document.getElementById(s.field).value;
+  var v = s.parse(raw);
+  if (v === null || v === undefined || raw === '') { voiceStatus.textContent = 'Mundhu answer ivvandi — matladandi, chip nokkandi, leka type cheyyandi.'; return; }
+  applyAns(v);
+};
+document.getElementById('speakBtn').onclick = function () {
+  if (window._lastOut) speakT(window._lastOut.summaryScript);
+};
 </script>
 </body>
 </html>

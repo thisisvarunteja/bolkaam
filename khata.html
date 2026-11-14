@@ -84,6 +84,7 @@
         </select>
         <input type="text" id="textIn" placeholder="Mic lekapothe, matlade line ye type cheyyandi…">
         <button class="small" id="addText">Add Entry</button>
+        <button class="small" id="speakTotals" style="background:#256D46;">🔊 Totals Vinipinchu</button>
       </div>
       <div class="samples">
         <h3>Try cheyyandi — ee lines cheppinattu nokkandi</h3>
@@ -207,6 +208,16 @@ if (!SR) {
     rec.start();
   };
 }
+document.getElementById('speakTotals').onclick = function () {
+  if (!('speechSynthesis' in window)) return;
+  var net = totals.sale + totals.payment - totals.expense;
+  var text = 'ఈ రోజు క్యాష్ సేల్స్ ' + totals.sale + ' రూపాయలు. ఉదార్ పెండింగ్ ' + totals.credit + ' రూపాయలు. పేమెంట్స్ ' + totals.payment + ' రూపాయలు. ఖర్చులు ' + totals.expense + ' రూపాయలు. నెట్ క్యాష్ ' + net + ' రూపాయలు.';
+  var u = new SpeechSynthesisUtterance(text);
+  var vs = speechSynthesis.getVoices();
+  for (var i = 0; i < vs.length; i++) { if (vs[i].lang && vs[i].lang.indexOf('te') === 0) { u.voice = vs[i]; break; } }
+  u.lang = 'te-IN'; u.rate = 0.96;
+  speechSynthesis.cancel(); speechSynthesis.speak(u);
+};
 renderTotals();
 </script>
 </body>
