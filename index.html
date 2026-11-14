@@ -4,89 +4,105 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BolKaam — Bas bolo, kaam ho gaya!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Karla:wght@400;600;700;800&family=Baloo+Tammudu+2:wght@600;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: #0d1117; color: #e6edf3; min-height: 100vh; padding: 20px 14px 48px; }
-  .wrap { max-width: 780px; margin: 0 auto; }
-  header { text-align: center; margin-bottom: 16px; }
-  header h1 { font-size: 36px; } header h1 span { color: #f85149; }
-  header p { color: #9aa7b4; margin-top: 6px; }
-  .badge { display: inline-block; margin-top: 10px; background: #21262d; border: 1px solid #30363d; color: #7ee787; padding: 4px 12px; border-radius: 999px; font-size: 12.5px; }
-  .panel { background: #161b22; border: 1px solid #30363d; border-radius: 14px; padding: 18px; margin-top: 14px; }
-  .panel h2 { font-size: 16px; margin-bottom: 12px; color: #79c0ff; }
-  label { display: block; font-size: 12.5px; color: #9aa7b4; text-transform: uppercase; letter-spacing: .5px; margin: 12px 0 5px; }
-  label:first-of-type { margin-top: 0; }
-  input, select, textarea { width: 100%; background: #0d1117; color: #e6edf3; border: 1px solid #30363d; border-radius: 8px; padding: 10px; font-size: 15px; font-family: inherit; }
-  textarea { min-height: 74px; resize: vertical; }
-  .row { display: flex; gap: 8px; flex-wrap: wrap; } .row > div { flex: 1 1 200px; }
-  button { cursor: pointer; border-radius: 9px; border: 1px solid #30363d; background: #21262d; color: #e6edf3; padding: 11px 16px; font-size: 15px; }
-  button.primary { background: #f85149; border-color: #f85149; color: #fff; font-weight: 700; width: 100%; margin-top: 16px; font-size: 16.5px; }
-  button:hover { filter: brightness(1.15); }
-  #micBtn { width: 64px; height: 64px; border-radius: 50%; background: #f85149; border: none; font-size: 28px; }
-  #micBtn.listening { background: #d29922; }
-  .microw { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
-  .microw span { color: #9aa7b4; font-size: 13.5px; }
-  #photoPreview { max-width: 100%; border-radius: 10px; margin-top: 10px; display: none; }
-  #output { display: none; }
-  #letter { white-space: pre-wrap; background: #0d1117; border: 1px solid #30363d; border-radius: 10px; padding: 16px; font-size: 14.5px; line-height: 1.55; }
-  .ref { color: #e3b341; font-weight: 700; }
-  .track { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-  .step { background: #0d1117; border: 1px solid #30363d; border-radius: 10px; padding: 12px; }
-  .step b { color: #7ee787; display: block; margin-bottom: 4px; font-size: 13.5px; }
-  .step span { font-size: 13.5px; color: #c9d1d9; }
-  #summary { font-size: 15.5px; line-height: 1.6; }
-  footer { text-align: center; color: #6e7b8a; font-size: 12.5px; margin-top: 24px; }
+  body { font-family: "Karla", system-ui, sans-serif; background: #F6EFDB; color: #211A12; min-height: 100vh; padding: 26px 14px 56px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"); }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  header { text-align: left; margin-bottom: 8px; }
+  .sticker { display: inline-block; background: #E79A00; color: #211A12; font-weight: 800; font-size: 12.5px; letter-spacing: .8px; text-transform: uppercase; padding: 5px 12px; border: 2px solid #211A12; border-radius: 999px; transform: rotate(-2deg); box-shadow: 3px 3px 0 #211A12; }
+  header h1 { font-family: "Fraunces", serif; font-weight: 900; font-size: 58px; line-height: 1; margin-top: 16px; letter-spacing: -.5px; }
+  header h1 span { color: #B3402A; }
+  header .tag { font-size: 19px; margin-top: 10px; font-weight: 600; }
+  header .tag .te { font-family: "Baloo Tammudu 2", cursive; font-weight: 800; }
+  header .sub { color: #5C5240; margin-top: 8px; font-size: 15.5px; max-width: 56ch; }
+  .panel { background: #FFFDF4; border: 2px solid #211A12; border-radius: 6px; padding: 20px; margin-top: 22px; box-shadow: 6px 6px 0 #211A12; }
+  .panel h2 { font-family: "Fraunces", serif; font-size: 21px; font-weight: 700; margin-bottom: 6px; }
+  .panel h2 .no { display: inline-block; background: #211A12; color: #F6EFDB; width: 28px; height: 28px; line-height: 28px; text-align: center; border-radius: 50%; font-size: 15px; margin-right: 8px; vertical-align: 2px; }
+  label { display: block; font-size: 12px; font-weight: 800; color: #8A4B12; text-transform: uppercase; letter-spacing: .8px; margin: 14px 0 5px; }
+  input, select, textarea { width: 100%; background: #FFFDF4; color: #211A12; border: 2px solid #211A12; border-radius: 4px; padding: 10px 11px; font-size: 15.5px; font-family: inherit; }
+  input:focus, select:focus, textarea:focus { outline: 3px solid #E79A00; outline-offset: 1px; }
+  textarea { min-height: 76px; resize: vertical; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; } .row > div { flex: 1 1 210px; }
+  button { cursor: pointer; font-family: inherit; border: 2px solid #211A12; border-radius: 4px; padding: 11px 16px; font-size: 15px; font-weight: 700; background: #FFFDF4; color: #211A12; box-shadow: 4px 4px 0 #211A12; transition: transform .08s, box-shadow .08s; }
+  button:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 #211A12; }
+  button.primary { background: #B3402A; color: #FFF6E8; width: 100%; margin-top: 18px; font-size: 17px; }
+  button.sample { width: 100%; margin-top: 14px; background: #E79A00; }
+  .microw { display: flex; align-items: center; gap: 14px; margin-top: 14px; background: #F6EFDB; border: 2px dashed #8A4B12; border-radius: 4px; padding: 12px; }
+  #micBtn { width: 62px; height: 62px; flex: 0 0 62px; border-radius: 50%; background: #E79A00; font-size: 27px; padding: 0; }
+  #micBtn.listening { background: #B3402A; }
+  .microw span { color: #5C5240; font-size: 14px; }
+  #photoPreview { max-width: 100%; border: 2px solid #211A12; border-radius: 4px; margin-top: 10px; display: none; }
+  #output { display: none; position: relative; }
+  .stamp { position: absolute; top: 16px; right: 16px; transform: rotate(6deg); border: 3px double #B3402A; color: #B3402A; font-family: "IBM Plex Mono", monospace; font-weight: 700; font-size: 14px; padding: 6px 10px; border-radius: 4px; background: rgba(255,253,244,.85); }
+  #letter { white-space: pre-wrap; background: #FFFFFF; border: 1.5px solid #CBBFA3; padding: 22px 20px; font-size: 15px; line-height: 1.6; margin-top: 10px; box-shadow: inset 0 0 0 6px #FFFDF4; }
+  #summary { font-size: 16px; line-height: 1.65; margin-top: 6px; }
+  .tear { border-top: 2.5px dashed #211A12; margin: 20px 0 4px; position: relative; }
+  .tear::before { content: "✂"; position: absolute; top: -13px; left: 6px; background: #FFFDF4; padding: 0 5px; font-size: 14px; }
+  .track { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 10px; }
+  .step { background: #F6EFDB; border: 2px solid #211A12; border-radius: 4px; padding: 12px; }
+  .step b { font-family: "IBM Plex Mono", monospace; color: #B3402A; display: block; margin-bottom: 5px; font-size: 13px; text-transform: uppercase; }
+  .step span { font-size: 14px; line-height: 1.45; display: block; }
+  footer { margin-top: 30px; font-size: 13.5px; color: #5C5240; text-align: left; }
+  footer b { color: #211A12; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
+    <span class="sticker">Voice → Finished Work</span>
     <h1>Bol<span>Kaam</span></h1>
-    <p>Bas bolo, kaam ho gaya! — Speak once, get finished work. Demo: Arji (civic complaint)</p>
-    <div class="badge">EXP-001 v2 · Hero flow: voice note → government-ready complaint letter</div>
+    <p class="tag">Bas bolo, kaam ho gaya! <span class="te">— cheppandi, pani ready!</span></p>
+    <p class="sub">Type cheyyalsina pani ledu. Mee problem okka voice note lo cheppandi — official complaint letter, reference number tho saha, ready ga vasthundi. Ee page lo ippudu: <b>Arji</b> (civic complaint).</p>
   </header>
 
   <div class="panel">
-    <h2>1 · Mee problem cheppandi (speak or type)</h2>
+    <h2><span class="no">1</span>Mee problem cheppandi</h2>
     <div class="row">
-      <div><label>Problem type</label>
+      <div><label>Problem enti?</label>
         <select id="ptype">
           <option value="water">Water pipe / drinking water</option>
           <option value="drainage">Drainage overflow</option>
-          <option value="streetlight">Streetlight not working</option>
-          <option value="road">Road damage / potholes</option>
-          <option value="garbage">Garbage not collected</option>
+          <option value="streetlight">Streetlight pani cheyyatledu</option>
+          <option value="road">Road damage / gothulu</option>
+          <option value="garbage">Garbage theeskapovatledu</option>
         </select></div>
-      <div><label>Days nunchi undi?</label><input id="days" type="number" value="3" min="1"></div>
+      <div><label>Enni days nunchi undi?</label><input id="days" type="number" value="3" min="1"></div>
     </div>
-    <label>Problem details (voice note laga cheppandi)</label>
+    <label>Problem details — matladinatte rayandi</label>
     <textarea id="desc" placeholder="Example: Mana street lo water pipe pagilipoindi, road motham neellu, nadavadam kashtam ga undi…"></textarea>
     <div class="microw">
       <button id="micBtn" title="Speak">🎤</button>
-      <span id="micStatus">Mic tap chesi Telugu/English lo matladandi — leka paina type cheyyandi. Sample kosam kinda button undi.</span>
+      <span id="micStatus">Mic nokki Telugu / English lo matladandi. Voice rakapothe paina type cheyyandi — rendu okkate pani chesthayi. Sample tho try cheyyalante kinda button undi.</span>
     </div>
-    <div class="row" style="margin-top:12px">
+    <div class="row">
       <div><label>Mee peru</label><input id="uname" type="text" placeholder="Peru"></div>
       <div><label>Area / Locality</label><input id="area" type="text" placeholder="Area, city"></div>
     </div>
-    <label>Photo (optional — street/problem photo)</label>
+    <label>Photo (unte — street / problem photo)</label>
     <input id="photo" type="file" accept="image/*">
     <img id="photoPreview" alt="Problem photo preview">
-    <button class="primary" id="sampleBtn" style="background:#21262d;border-color:#30363d;font-weight:600">▶ Sample voice note tho fill chey</button>
+    <button class="sample" id="sampleBtn">▶ Sample voice note tho fill chey</button>
     <button class="primary" id="genBtn">✉️ Complaint Letter Ready Chey</button>
   </div>
 
   <div class="panel" id="output">
-    <h2>2 · Mee finished work — <span class="ref" id="refId"></span></h2>
-    <label>Official complaint letter (English, submit-ready)</label>
+    <div class="stamp" id="refId">BK-2026-0000</div>
+    <h2><span class="no">2</span>Mee finished work</h2>
+    <label>Official complaint letter — English, submit-ready</label>
     <div id="letter"></div>
-    <label style="margin-top:16px">Meeku simple ga (Telugu summary)</label>
+    <div class="tear"></div>
+    <label>Meeku simple ga — Telugu summary</label>
     <p id="summary"></p>
-    <label style="margin-top:16px">Tracking — next enti?</label>
+    <div class="tear"></div>
+    <label>Tracking — tarvatha enti?</label>
     <div class="track" id="track"></div>
   </div>
 
-  <footer>BolKaam v2 demo · Letter is generated by workflow rules on this page — no facts are invented; submit is always your final tap.</footer>
+  <footer>Built by <b>Varun</b> · NextSkill · for Scaler × Wispr Flow — <i>India Runs on Voice</i>. Letter mee words thone build avuthundi, kottha facts emi add avavu. Submit cheyyadam eppudu meere — BolKaam auto ga emi pampadu.</footer>
 </div>
 
 <script>
